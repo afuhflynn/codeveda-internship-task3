@@ -9,6 +9,10 @@ const getAllTodos = async () => {
     return;
   }
   const data = await res.json();
+  if (!data.todos) {
+    alert("An error occurred fetching your tasks.");
+    return;
+  }
   tasks = data.todos;
 };
 
@@ -16,6 +20,11 @@ async function renderTasks() {
   await getAllTodos();
   const todoList = document.getElementById("todo-list");
   todoList.innerHTML = "";
+  window.addEventListener("load", () => {
+    if (tasks && tasks.length === 0) {
+      alert("No todos yet. Add a todo to get going.");
+    }
+  });
   tasks.forEach((task, index) => {
     const listItem = document.createElement("li");
     listItem.innerHTML = `
@@ -44,6 +53,9 @@ async function addTask() {
     mode: "cors",
     body: JSON.stringify({ body: taskName, complete: false }),
   });
+  if (res.status === 409) {
+    alert(`Item: ${taskName} already exists.`);
+  }
   if (!res.ok) {
     return;
   }
